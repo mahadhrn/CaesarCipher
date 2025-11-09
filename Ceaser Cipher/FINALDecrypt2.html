@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decryption | JS</title>
+
+    <style>
+        :root{
+            font-family: 'Rubik', sans-serif;
+			text-decoration: none; 
+        }
+        ::selection{
+            background-color: #c65858;
+            color:#000;
+            border-radius: 20px;
+        }
+        body {
+            line-height: 1.5;
+            padding: 0 2rem;
+            color:#FFF;
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+            background: url(./Assets/decrypt_bg.svg) no-repeat center center fixed;
+            background-size: cover; 
+        }
+        .fade-in{
+            opacity: 100;
+        }
+        .heading h3{
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 20px;
+            width: 61em;
+            letter-spacing: 0.7px;
+            font-size: 38px;
+            padding-left: 45px;
+			padding-top: 2rem;
+        }
+        .heading em{
+            font-size: 35px;
+            font-style: normal;
+            color: #9c3535;
+            padding-left: 5px;
+            letter-spacing: 1.5px;
+        }
+        .card-form {
+            padding: 10px 16px 0px 16px;
+        }
+
+        #messageInput, #encKeyInput, #encMessage{
+            border-color: #3c3c3c;
+            background-color: transparent;
+            border: 1.6px solid #391e1e;
+            color: #fff;
+            border-radius: 18px;
+            font:inherit;
+            margin-left: 23px;;
+            font-size: 1.125rem;
+            padding: 10px 0px 8px 21px;
+            z-index: 1;
+            &:focus{ 
+                outline: 0;
+                border-color: #ab2d2d;
+                border-width: 2px;
+                transition: all 0.18s ease-in;
+                }
+        }
+        .button {
+            font: inherit;
+            font-size: 1.125rem;
+            padding: 10px 0px 10px 0px;
+            width:8rem;
+            font-weight: 500;
+            background-color: #9c3535;
+            border-radius: 18px;
+            color: #FFF;
+            border: 0;
+            margin-top: 8px;
+            margin-left: 20px;
+            text-decoration: none;
+            /* BounceEffect */
+            transition: transform .3s;
+            transition-timing-function: cubic-bezier(0.445, 1.65, 0.455, 1.485);
+        }
+        .button:hover {
+            font-size: 18px;
+            padding: 10px 0px 10px 0px;
+            margin: 8px 0px 0px 20px;
+            transform: scale(1.02);
+            text-shadow: 2px 2px 30px rgba(0, 0, 0, 0.499);
+            box-shadow: 0 0 12px rgba(211, 70, 70, 0.363);
+        }
+        .button a{
+            text-decoration: none; color: #FFF;
+        }
+        /* DECRYPTED TEXT */
+        .messageoutput{
+            margin-top: 3rem;
+            border: 2px;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        footer h3{
+            display: inline;
+        }
+        footer span{
+            position: fixed;
+            background-color: #0c0909b3;
+            padding: 0px 7px 7px 22px;
+            border-radius: 22px;
+            margin-top: 210px;
+            margin-left: 1137px;
+        }
+        footer .button:hover {
+            font-size: 1.125rem;
+            text-shadow: 2px 2px 15px #2e2a44;
+            box-shadow: 0 0 20px rgba(100, 87, 255, 0.6);
+        }
+        #fileInput{
+                opacity: 0%;
+        }    
+    </style>
+</head>
+
+<body class="fade-in">
+    <div class="pagecard">
+
+        <div class="heading">
+            <h3>Ceaser Cipher <em>(Decryption)</em></h3>
+        </div>
+
+        <form novalidate class="card-form" spellcheck="false">
+            <div class="messageinput">
+
+                <!-- UploadFile -->
+                <label style="       
+                color: #cccccc;
+                background-color: #ffffff17;
+                padding: 3px 15px 2px 16px;
+                border-radius: 12px;
+                cursor: pointer;
+                display: inline-block;
+                z-index: 1;
+                text-align: center;
+                font-size: 1.125rem;
+                margin: 20px 0px 0px 25px;" class="choosebutton" for="fileInput">Upload File</label>
+                <input type="file" id="fileInput" accept=".txt" onchange="handleFileSelect(event)">
+                <p id="fileNameDisplay"></p>
+                
+                <input type="text" id="messageInput" size="50" placeholder="Message" required>
+                <input type="text" id="encKeyInput" size="20" placeholder="Key" required>
+
+                <button  style="margin-left: 65px;" class="button" onclick="encMsg(event)">Decrypt</button>
+                <button class="button" onclick="saveToFile()">Save</button>
+            </div>
+
+            <div class="messageoutput">
+                <p style="margin-left: 1.5rem; font-weight: 600;font-size: 18px; padding-left: 7px;">Decrypted Message</p>
+                <textarea disabled style="resize: none;" id="encMessage" rows="4" cols="73"></textarea>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        <span style="bottom:32px;">
+            <h3>AlsoCheck: 👉</h3>
+            <button class="button" style="background-color: #6457ff; margin-left: 2rem;"><a href="./FINALEncrypt2.html">Encryption</a></button>
+        </span>
+    </footer>
+
+    <script>
+        function encMsg(event) {
+            event.preventDefault(); // Prevent default form submission behavior
+    
+            const messageInput = document.getElementById('messageInput');
+            const keyInput = document.getElementById('encKeyInput');
+            const encryptedMessageTextarea = document.getElementById('encMessage');
+    
+            // Get Values from the input file
+            const message = messageInput.value;
+            const key = parseInt(keyInput.value);
+    
+            let encryptedMessage = '';
+            for (let i = 0; i < message.length; i++) {
+                const charCode = message.charCodeAt(i);
+                const encryptedCharCode = charCode - key; // Decrypt
+                const encryptedChar = String.fromCharCode(encryptedCharCode);
+                encryptedMessage += encryptedChar;
+            }
+            encryptedMessageTextarea.value = encryptedMessage;
+        }
+
+
+        function handleFileSelect(event) {
+            const fileInput = event.target;
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            const messageInput = document.getElementById('messageInput');
+    
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const fileName = file.name;
+                fileNameDisplay.textContent = `Selected File: ${fileName}`;
+    
+                // Read the content of the file
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // Set the file content into the messageInput field
+                    messageInput.value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        }
+    
+        function saveToFile() {
+            const encryptedMessageTextarea = document.getElementById('encMessage');
+            const encryptedText = encryptedMessageTextarea.value;
+    
+            // Create a Blob with the text content
+            const blob = new Blob([encryptedText], { type: 'text/plain' });
+    
+            // Create a link element
+            const link = document.createElement('a');
+    
+            // Set the download attribute with a desired file name
+            link.download = 'Decrypted_Text.txt';
+    
+            // Create a URL for the Blob and set it as the href
+            link.href = window.URL.createObjectURL(blob);
+    
+            // Append the link to the body and click it programmatically
+            document.body.appendChild(link);
+            link.click();
+    
+            // Remove the link from the body
+            document.body.removeChild(link);
+        }
+    </script>
+    
+</body>
+
+</html>
